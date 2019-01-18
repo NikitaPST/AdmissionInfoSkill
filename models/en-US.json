@@ -1,0 +1,124 @@
+{
+    "interactionModel": {
+        "languageModel": {
+            "invocationName": "admission info",
+            "intents": [
+                {
+                    "name": "AMAZON.FallbackIntent",
+                    "samples": []
+                },
+                {
+                    "name": "AMAZON.CancelIntent",
+                    "samples": []
+                },
+                {
+                    "name": "AMAZON.HelpIntent",
+                    "samples": [
+                        "how do I search"
+                    ]
+                },
+                {
+                    "name": "AMAZON.StopIntent",
+                    "samples": []
+                },
+                {
+                    "name": "AMAZON.NavigateHomeIntent",
+                    "samples": []
+                },
+                {
+                    "name": "AMAZON.RepeatIntent",
+                    "samples": [
+                        "startover",
+                        "new search",
+                        "search again"
+                    ]
+                },
+                {
+                    "name": "SearchForApplicationFee",
+                    "slots": [
+                        {
+                            "name": "universityName",
+                            "type": "AMAZON.SearchQuery"
+                        }
+                    ],
+                    "samples": [
+                        "find me application fee for {universityName}",
+						"get me application fee for {universityName}",
+						"give me application fee for {universityName}",
+						"what is application fee for {universityName}",
+						"tell me application fee for {universityName}",
+						"find me what is application fee for {universityName}",
+						"get me what is application fee for {universityName}",
+						"give me what is application fee for {universityName}",
+                        "{universityName} application fee",
+                        "application fee {universityName}"
+                    ]
+                },
+				{
+                    "name": "SearchForTuition",
+                    "slots": [
+                        {
+                            "name": "universityName",
+                            "type": "AMAZON.SearchQuery"
+                        }
+                    ],
+                    "samples": [
+                        "find me tuition of {universityName}",
+						"get me tuition of {universityName}",
+						"give me tuition of {universityName}",
+						"what is tuition of {universityName}",
+						"tell me tuition of {universityName}",
+						"find me how much {universityName} cost",
+						"get me how much {universityName} cost",
+						"give me how much {universityName} cost",
+                        "{universityName} tuition",
+                        "tuition {universityName}",
+						"{universityName} cost",
+                        "cost {universityName}"
+                    ]
+                },
+				{
+                    "name": "SearchForFinancialAid",
+                    "slots": [
+                        {
+                            "name": "universityName",
+                            "type": "AMAZON.SearchQuery"
+                        }
+                    ],
+                    "samples": [
+                        "find me financial aid for {universityName}",
+						"get me financial aid for {universityName}",
+						"give me financial aid for {universityName}",
+						"what is financial aid amount for {universityName}",
+						"find me financial aid amount for {universityName}",
+						"get me financial aid amount for {universityName}",
+						"give me financial aid amount for {universityName}",
+                        "{universityName} financial aid",
+                        "financial aid {universityName}"
+                    ]
+                },
+				{
+                    "name": "SearchForAdmissionRate",
+                    "slots": [
+                        {
+                            "name": "universityName",
+                            "type": "AMAZON.SearchQuery"
+                        }
+                    ],
+                    "samples": [
+                        "find me admission rate for {universityName}",
+						"get me admission rate for {universityName}",
+						"give me admission rate for {universityName}",
+						"what is admission rate for {universityName}",
+						"tell me admission rate for {universityName}",
+						"find me what is admission rate for {universityName}",
+						"get me what is admission rate for {universityName}",
+						"give me what is admission rate for {universityName}",
+                        "{universityName} admission rate",
+                        "admission rate {universityName}"
+                    ]
+                }
+            ]
+        }
+    }
+}
