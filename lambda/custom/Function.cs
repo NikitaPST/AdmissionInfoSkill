@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Net.Http;
 using System.Threading.Tasks;
 using Alexa.NET.Request;
 using Alexa.NET.Request.Type;
@@ -7,6 +8,7 @@ using Alexa.NET.Response;
 using Amazon.DynamoDBv2;
 using Amazon.DynamoDBv2.DocumentModel;
 using Amazon.Lambda.Core;
+using Newtonsoft.Json.Linq;
 
 
 // Assembly attribute to enable the Lambda function's JSON input to be converted into a .NET class.
@@ -25,31 +27,25 @@ namespace AdmissionInfoLambda
         {
             public string UniversityName { get; set; }
             public string Value { get; set; }
-            public byte[] Image { get; set; }
-        }
-
-        /// <summary>
-        /// Skill state
-        /// </summary>
-        public enum STATES
-        {
-            SEARCHMODE,
-            MULTIPLE_RESULTS
+            public string ImageLink { get; set; }
         }
 
         // CONSTANTS
-
+        private const string INDEX_NAME = "universities/";
         private const string LAST_SEARCH_KEY = "last_search";
         private const string LAST_INTENT_KEY = "last_intent";
         private const string LOCALENAME = "LOCALE";
+        private const string REGION = "us-west-2";
         private const string STATE_KEY = "state";
         private const string TABLE_NAME = "Universities";
         private const string US_LOCALE = "en-US";
+        private readonly string ESADDRESS = Environment.GetEnvironmentVariable("EsAddress");
+        private readonly string ACCESS_KEY = Environment.GetEnvironmentVariable("AccessKey");
+        private readonly string SECRET_KEY = Environment.GetEnvironmentVariable("SecretKey");
 
         // FIELDS
         private ILambdaContext context = null;
         private SkillResponse response = null;
-        private STATES state = STATES.SEARCHMODE;
         
         /// <summary>
         /// Application entry point.
@@ -67,15 +63,11 @@ namespace AdmissionInfoLambda
                 response.Response.ShouldEndSession = false;
                 response.Version = "1.0";
 
-                state = GetState(input);
                 string locale = GetLocale(input);
                 Resources resources = new Resources();
                 SkillResource resource = resources.GetResources(locale);
 
-                if (state == STATES.SEARCHMODE)
-                {
-                    await SearchHandler(input, resource);
-                }
+                await SearchHandler(input, resource);
 
                 return response;
             }
@@ -95,7 +87,6 @@ namespace AdmissionInfoLambda
         {
             if (input.Request is LaunchRequest)
             {
-                state = STATES.SEARCHMODE;
                 Speak(resource.WelcomeMessage);
             }
             else if (input.Request is IntentRequest)
@@ -160,11 +151,6 @@ namespace AdmissionInfoLambda
 
             response.Response.OutputSpeech = speechMessage;
             response.Response.ShouldEndSession = shouldEndSession;
-
-            if (!shouldEndSession)
-            {
-                response.SessionAttributes[STATE_KEY] = state.ToString();
-            }
         }
 
         /// <summary>
@@ -177,27 +163,6 @@ namespace AdmissionInfoLambda
             {
                 context.Logger.LogLine(text);
             }
-        }
-
-        /// <summary>
-        /// Get session state from request.
-        /// </summary>
-        /// <param name="input">User input.</param>
-        /// <returns>Current state.</returns>
-        private STATES GetState(SkillRequest input)
-        {
-            STATES result = STATES.SEARCHMODE;
-
-            Dictionary<string, object> dictionary = input.Session.Attributes;
-            if (dictionary!= null)
-            {
-                if (dictionary.ContainsKey(STATE_KEY))
-                {
-                    result = (STATES)dictionary[STATE_KEY];
-                }
-            }
-
-            return result;
         }
 
         /// <summary>
@@ -255,7 +220,7 @@ namespace AdmissionInfoLambda
                 }
                 else
                 {
-                    string message = string.Format(resource.ApplicationFeeMessage, universityName, result.Value);
+                    string message = string.Format(resource.ApplicationFeeMessage, result.UniversityName, result.Value);
                     Speak(message, false);
                 }
             }
@@ -284,7 +249,7 @@ namespace AdmissionInfoLambda
                 }
                 else
                 {
-                    string message = string.Format(resource.TuitionMessage, universityName, result.Value);
+                    string message = string.Format(resource.TuitionMessage, result.UniversityName, result.Value);
                     Speak(message, false);
                 }
             }
@@ -313,7 +278,7 @@ namespace AdmissionInfoLambda
                 }
                 else
                 {
-                    string message = string.Format(resource.FinancialAidMessage, universityName, result.Value);
+                    string message = string.Format(resource.FinancialAidMessage, result.UniversityName, result.Value);
                     Speak(message, false);
                 }
             }
@@ -342,7 +307,7 @@ namespace AdmissionInfoLambda
                 }
                 else
                 {
-                    string message = string.Format(resource.AdmissionRateMessage, universityName, result.Value);
+                    string message = string.Format(resource.AdmissionRateMessage, result.UniversityName, result.Value);
                     Speak(message, false);
                 }
             }
@@ -377,28 +342,82 @@ namespace AdmissionInfoLambda
         private async Task<List<SearchResult>> SearchDatabase(string universityName, string fieldName)
         {
             List<SearchResult> results = new List<SearchResult>();
+
+            List<string> names = await SearchESIndex(universityName);
+
             using (AmazonDynamoDBClient client = new AmazonDynamoDBClient(Amazon.RegionEndpoint.USWest2))
             {
                 Table universityTable = Table.LoadTable(client, TABLE_NAME);
-                GetItemOperationConfig config = new GetItemOperationConfig
-                {
-                    AttributesToGet = new List<string> { "UniversityName", fieldName, "Image" }
-                };
 
-                Document document = await universityTable.GetItemAsync(universityName, config);
-                if (document!= null)
+                foreach (string name in names)
                 {
-                    SearchResult result = new SearchResult()
+                    GetItemOperationConfig config = new GetItemOperationConfig
                     {
-                        UniversityName = document["UniversityName"].AsString(),
-                        Value = document[fieldName].AsString(),
-                        Image = document["Image"].AsByteArray()
+                        AttributesToGet = new List<string> { "UniversityName", fieldName, "ImageLink" }
                     };
 
-                    results.Add(result);
+                    Document document = await universityTable.GetItemAsync(name, config);
+                    if (document != null)
+                    {
+                        SearchResult result = new SearchResult()
+                        {
+                            UniversityName = document["UniversityName"].AsString()
+                        };
+                        if (document.Keys.Contains(fieldName))
+                        {
+                            result.Value = document[fieldName].AsString();
+                        }
+                        if (document.Keys.Contains("ImageLink"))
+                        {
+                            result.ImageLink = document["ImageLink"].AsString();
+                        }
+
+                        results.Add(result);
+                        break;
+                    }
                 }
             }
             return results;
+        }
+
+        /// <summary>
+        /// Query ElasticSearch index for possible match with university name.
+        /// </summary>
+        /// <param name="universityName">Raw university name.</param>
+        /// <returns>List of possible matches in index.</returns>
+        private async Task<List<string>> SearchESIndex(string universityName)
+        {
+            List<string> result = new List<string>();
+            Aws4RequestSigner.AWS4RequestSigner signer = new Aws4RequestSigner.AWS4RequestSigner(ACCESS_KEY, SECRET_KEY);
+
+            string address = ESADDRESS + INDEX_NAME + "_search";
+            string message = string.Format(@"{{ ""query"": {{ ""match"": {{ ""name"": ""{0}"" }} }} }}", universityName);
+            HttpRequestMessage request = new HttpRequestMessage()
+            {
+                Method = HttpMethod.Post,
+                RequestUri = new Uri(address),
+                Content = new StringContent(message)
+            };
+            request = await signer.Sign(request, "es", REGION);
+
+            string responseString = string.Empty;
+            using (HttpClient client = new HttpClient())
+            {
+                HttpResponseMessage response = await client.SendAsync(request);
+                responseString = await response.Content.ReadAsStringAsync();
+            }
+
+            JObject json = JObject.Parse(responseString);
+            if (json["hits"]["hits"]!= null)
+            {
+                JArray hits = (JArray)json["hits"]["hits"];
+                foreach (JToken hit in hits)
+                {
+                    result.Add((string)hit["_source"]["name"]);
+                }
+            }
+
+            return result;
         }
     }
 }
