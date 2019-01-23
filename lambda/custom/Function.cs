@@ -98,7 +98,8 @@ namespace AdmissionInfoLambda
                         Speak(resource.ShutdownMessage);
                         break;
                     case "AMAZON.RepeatIntent":
-                        throw new NotImplementedException();
+                        await Repeat(input, resource);
+                        break;
                     case "AMAZON.HelpIntent":
                         Speak(resource.HelpMessage);
                         break;
@@ -200,6 +201,35 @@ namespace AdmissionInfoLambda
         }
 
         /// <summary>
+        /// Reproducing previous request.
+        /// </summary>
+        /// <param name="input">User input.</param>
+        /// <param name="resource">Resource.</param>
+        private async Task Repeat(SkillRequest input, SkillResource resource)
+        {
+            if (input.Session.Attributes.ContainsKey(LAST_INTENT_KEY) && input.Session.Attributes.ContainsKey(LAST_SEARCH_KEY))
+            {
+                string universityName = (string)input.Session.Attributes[LAST_SEARCH_KEY];
+                string intentName = (string)input.Session.Attributes[LAST_INTENT_KEY];
+                switch (intentName)
+                {
+                    case "SearchForApplicationFee":
+                        await SearchForApplicationFee(universityName, resource);
+                        break;
+                    case "SearchForTuition":
+                        await SearchForTuition(universityName, resource);
+                        break;
+                    case "SearchForFinancialAid":
+                        await SearchForFinancialAid(universityName, resource);
+                        break;
+                    case "SearchForAdmissionRate":
+                        await SearchForAdmissionRate(universityName, resource);
+                        break;
+                }
+            }
+        }
+
+        /// <summary>
         /// Searches application fee by college name.
         /// </summary>
         /// <param name="input">User input.</param>
@@ -207,9 +237,19 @@ namespace AdmissionInfoLambda
         private async Task SearchForApplicationFee(SkillRequest input, SkillResource resource)
         {
             string universityName = GetSlot((IntentRequest)input.Request, "universityName");
+            await SearchForApplicationFee(universityName, resource);
+        }
+
+        /// <summary>
+        /// Searches application fee by college name.
+        /// </summary>
+        /// <param name="universityName">University name.</param>
+        /// <param name="resource">Resource.</param>
+        private async Task SearchForApplicationFee(string universityName, SkillResource resource)
+        {
             List<SearchResult> searchResults = await SearchDatabase(universityName, "ApplicationFee");
-            //response.SessionAttributes[LAST_SEARCH_KEY] = searchResults;
-            //response.SessionAttributes[LAST_INTENT_KEY] = "SearchForApplicationFee";
+            response.SessionAttributes[LAST_SEARCH_KEY] = universityName;
+            response.SessionAttributes[LAST_INTENT_KEY] = "SearchForApplicationFee";
 
             if (searchResults.Count > 0)
             {
@@ -238,7 +278,19 @@ namespace AdmissionInfoLambda
         private async Task SearchForTuition(SkillRequest input, SkillResource resource)
         {
             string universityName = GetSlot((IntentRequest)input.Request, "universityName");
+            await SearchForTuition(universityName, resource);
+        }
+
+        /// <summary>
+        /// Searches tuition by college name.
+        /// </summary>
+        /// <param name="universityName">University name.</param>
+        /// <param name="resource">Resource.</param>
+        private async Task SearchForTuition(string universityName, SkillResource resource)
+        {
             List<SearchResult> searchResults = await SearchDatabase(universityName, "Tuition");
+            response.SessionAttributes[LAST_INTENT_KEY] = "SearchForTuition";
+            response.SessionAttributes[LAST_SEARCH_KEY] = universityName;
 
             if (searchResults.Count > 0)
             {
@@ -267,7 +319,19 @@ namespace AdmissionInfoLambda
         private async Task SearchForFinancialAid(SkillRequest input, SkillResource resource)
         {
             string universityName = GetSlot((IntentRequest)input.Request, "universityName");
+            await SearchForFinancialAid(universityName, resource);
+        }
+
+        /// <summary>
+        /// Searches financial aid package by college name.
+        /// </summary>
+        /// <param name="universityName">University name.</param>
+        /// <param name="resource">Resource.</param>
+        private async Task SearchForFinancialAid(string universityName, SkillResource resource)
+        {
             List<SearchResult> searchResults = await SearchDatabase(universityName, "FinancialAid");
+            response.SessionAttributes[LAST_INTENT_KEY] = "SearchForFinancialAid";
+            response.SessionAttributes[LAST_SEARCH_KEY] = universityName;
 
             if (searchResults.Count > 0)
             {
@@ -296,7 +360,19 @@ namespace AdmissionInfoLambda
         private async Task SearchForAdmissionRate(SkillRequest input, SkillResource resource)
         {
             string universityName = GetSlot((IntentRequest)input.Request, "universityName");
+            await SearchForAdmissionRate(universityName, resource);
+        }
+
+        /// <summary>
+        /// Searches admission rate by college name.
+        /// </summary>
+        /// <param name="universityName">University name.</param>
+        /// <param name="resource">Resource.</param>
+        private async Task SearchForAdmissionRate(string universityName, SkillResource resource)
+        {
             List<SearchResult> searchResults = await SearchDatabase(universityName, "AdmissionRate");
+            response.SessionAttributes[LAST_INTENT_KEY] = "SearchForAdmissionRate";
+            response.SessionAttributes[LAST_SEARCH_KEY] = universityName;
 
             if (searchResults.Count > 0)
             {
