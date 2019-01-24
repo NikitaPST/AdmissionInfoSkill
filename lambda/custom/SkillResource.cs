@@ -24,10 +24,13 @@ namespace AdmissionInfoLambda
         public string NoTuitionFound { get; set; }
         public string NoFinancialAidFound { get; set; }
         public string NoAdmissionRateFound { get; set; }
+        public string SampleIntroMessage { get; set; }
+        public string[] SampleMessages { get; set; }
 
         public SkillResource(string language)
         {
             Language = language;
+            SampleMessages = new string[4];
         }
     }
 }

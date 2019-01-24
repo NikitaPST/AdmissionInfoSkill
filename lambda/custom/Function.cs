@@ -101,7 +101,7 @@ namespace AdmissionInfoLambda
                         await Repeat(input, resource);
                         break;
                     case "AMAZON.HelpIntent":
-                        Speak(resource.HelpMessage);
+                        Speak(GetHelpMessage(resource));
                         break;
                     case "AMAZON.StopIntent":
                     case "AMAZON.CancelIntent":
@@ -198,6 +198,17 @@ namespace AdmissionInfoLambda
                 { LOCALENAME, locale }
             };
             return locale;
+        }
+
+        /// <summary>
+        /// Generates help message.
+        /// </summary>
+        /// <param name="resource">Resource.</param>
+        /// <returns>Generated message.</returns>
+        private string GetHelpMessage(SkillResource resource)
+        {
+            Random r = new Random();
+            return resource.HelpMessage + " " + resource.SampleIntroMessage + resource.SampleMessages[r.Next(4)];
         }
 
         /// <summary>
