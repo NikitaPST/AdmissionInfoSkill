@@ -45,10 +45,10 @@ namespace AdmissionInfoLambda
             resource.ShutdownMessage = "Ok.";
             resource.HelpMessage = "I can help you find basic information about US college admission like tuition cost, application fees, financial aid packages and admission rates.";
             resource.StartOverMessage = "Ok, starting over.";
-            resource.ApplicationFeeMessage = "Application fee for {0} is {1}.";
+            resource.ApplicationFeeMessage = "Application fee for {0} is ${1}.";
             resource.TuitionMessage = "Tuition cost for {0} is {1}.";
-            resource.FinancialAidMessage = "Average financial aid package in {0} is {1}.";
-            resource.AdmissionRateMessage = "Admission rate in {0} is {1}.";
+            resource.FinancialAidMessage = "Average financial aid package in {0} is ${1}.";
+            resource.AdmissionRateMessage = "Admission rate in {0} is {1}%.";
 
             resource.NoUniversityFound = "Hmm. I couldn't find data for {0}.";
             resource.NoApplicationFeeFound = "No information available for application fees in {0}.";

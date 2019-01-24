@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Net.Http;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Alexa.NET.Request;
 using Alexa.NET.Request.Type;
@@ -28,6 +29,12 @@ namespace AdmissionInfoLambda
             public string UniversityName { get; set; }
             public string Value { get; set; }
             public string ImageLink { get; set; }
+        }
+
+        enum ResponseType
+        {
+            Plain,
+            SSML
         }
 
         // CONSTANTS
@@ -136,7 +143,8 @@ namespace AdmissionInfoLambda
         /// </summary>
         /// <param name="message">Speech message.</param>
         /// <param name="shouldEndSession">Terminate session flag.</param>
-        private void Speak(string message, bool shouldEndSession = true)
+        /// <param name="type">Response type.</param>
+        private void Speak(string message, bool shouldEndSession = true, ResponseType type = ResponseType.Plain)
         {
             //if (title!= string.Empty)
             //{
@@ -147,10 +155,19 @@ namespace AdmissionInfoLambda
             //    response.Response.Card = card;
             //}
 
-            PlainTextOutputSpeech speechMessage = new PlainTextOutputSpeech();
-            speechMessage.Text = message;
+            if (type == ResponseType.SSML)
+            {
+                SsmlOutputSpeech speechMessage = new SsmlOutputSpeech();
+                speechMessage.Ssml = message;
+                response.Response.OutputSpeech = speechMessage;
+            }
+            else
+            {
+                PlainTextOutputSpeech speechMessage = new PlainTextOutputSpeech();
+                speechMessage.Text = message;
+                response.Response.OutputSpeech = speechMessage;
+            }
 
-            response.Response.OutputSpeech = speechMessage;
             response.Response.ShouldEndSession = shouldEndSession;
         }
 
@@ -272,7 +289,8 @@ namespace AdmissionInfoLambda
                 else
                 {
                     string message = string.Format(resource.ApplicationFeeMessage, result.UniversityName, result.Value);
-                    Speak(message, false);
+                    message = MakeSSML(message);
+                    Speak(message, false, ResponseType.SSML);
                 }
             }
             else
@@ -313,7 +331,9 @@ namespace AdmissionInfoLambda
                 else
                 {
                     string message = string.Format(resource.TuitionMessage, result.UniversityName, result.Value);
-                    Speak(message, false);
+                    message = InsertCurrencySymbol(message);
+                    message = MakeSSML(message);
+                    Speak(message, false, ResponseType.SSML);
                 }
             }
             else
@@ -354,7 +374,8 @@ namespace AdmissionInfoLambda
                 else
                 {
                     string message = string.Format(resource.FinancialAidMessage, result.UniversityName, result.Value);
-                    Speak(message, false);
+                    message = MakeSSML(message);
+                    Speak(message, false, ResponseType.SSML);
                 }
             }
             else
@@ -395,7 +416,8 @@ namespace AdmissionInfoLambda
                 else
                 {
                     string message = string.Format(resource.AdmissionRateMessage, result.UniversityName, result.Value);
-                    Speak(message, false);
+                    message = MakeSSML(message);
+                    Speak(message, false, ResponseType.SSML);
                 }
             }
             else
@@ -505,6 +527,48 @@ namespace AdmissionInfoLambda
             }
 
             return result;
+        }
+
+        /// <summary>
+        /// Convert plain message to SSML.
+        /// </summary>
+        /// <param name="message">Original message.</param>
+        /// <returns>Transformed message.</returns>
+        private string MakeSSML(string message)
+        {
+            Regex r = new Regex(@"\$?([0-9]{1,3},([0-9]{3},)*[0-9]{3}|[0-9]+)(.[0-9][0-9])?\%?");
+            MatchCollection matches = r.Matches(message);
+            HashSet<string> found = new HashSet<string>();
+            foreach (Match match in matches)
+            {
+                found.Add(match.Value);
+            }
+            foreach (string match in found)
+            {
+                message = message.Replace(match, "<say-as interpret-as=\"unit\">" + match + "</say-as>");
+            }
+            return ("<speak>" + message + "</speak>");
+        }
+
+        /// <summary>
+        /// Inserts currency symbol into the message.
+        /// </summary>
+        /// <param name="message">Original message.</param>
+        /// <returns>Message with currency symbol in it.</returns>
+        private string InsertCurrencySymbol(string message)
+        {
+            Regex r = new Regex(@"([0-9]{1,3},([0-9]{3},)*[0-9]{3}|[0-9]+)(.[0-9][0-9])?\s");
+            MatchCollection matches = r.Matches(message);
+            HashSet<string> found = new HashSet<string>();
+            foreach (Match match in matches)
+            {
+                found.Add(match.Value);
+            }
+            foreach (string match in found)
+            {
+                message = message.Replace(match, "$" + match);
+            }
+            return message;
         }
     }
 }
