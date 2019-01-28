@@ -40,7 +40,7 @@ namespace AdmissionInfoLambda
         {
             SkillResource resource = new SkillResource(locale);
 
-            resource.SkillName = "Admission info";
+            resource.SkillName = "Admission office";
             resource.WelcomeMessage = "Welcome to " + resource.SkillName + ". Learn about US colleges tuition, application fees, average financial aid packages and admission rates.";
             resource.ShutdownMessage = "Ok.";
             resource.HelpMessage = "I can help you find basic information about US college admission like tuition cost, application fees, financial aid packages and admission rates.";
@@ -57,10 +57,10 @@ namespace AdmissionInfoLambda
             resource.NoAdmissionRateFound = "No information available for admission rates in {0}.";
 
             resource.SampleIntroMessage = "For example, try saying, ";
-            resource.SampleMessages[0] = "Alexa, ask Admission Info to find me application fee for Harvard College.";
-            resource.SampleMessages[1] = "Alexa, ask Admission Info Brown University cost.";
-            resource.SampleMessages[2] = "Alexa, ask Admission Info what is financial aid amount for Yale University.";
-            resource.SampleMessages[3] = "Alexa, ask Admission Info Dartmouth College admission rate.";
+            resource.SampleMessages[0] = "Alexa, ask Admission Office to find me application fee for Harvard College.";
+            resource.SampleMessages[1] = "Alexa, ask Admission Office Brown University cost.";
+            resource.SampleMessages[2] = "Alexa, ask Admission Office what is financial aid amount for Yale University.";
+            resource.SampleMessages[3] = "Alexa, ask Admission Office Dartmouth College admission rate.";
 
             return resource;
         }

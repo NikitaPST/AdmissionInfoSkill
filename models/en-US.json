@@ -1,7 +1,7 @@
 {
     "interactionModel": {
         "languageModel": {
-            "invocationName": "admission info",
+            "invocationName": "admission office",
             "intents": [
                 {
                     "name": "AMAZON.FallbackIntent",
