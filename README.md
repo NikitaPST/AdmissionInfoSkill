@@ -2,13 +2,19 @@
 
 Alexa Skill that helps find basic information about US college admission. For example, tuition cost, application fees, financial aid packages and admission rates.
 
+![Admission Office Screenshot](http://nikitapestin.com/icons/AdmissionOfficeScreen.png)
+
+## Installation
+
+You can install the skill from either [Alexa Skill Page](https://www.amazon.com/dp/B07N6BK145/ref=sr_1_27) or through your Alexa App.
+
 ## Usage
 
 Try saying following phrases:
-* Alexa, ask Admission Info what is application fee for Harvard University.
-* Alexa, ask Admission Info Duke University cost.
-* Alexa, ask Admission Info what is financial aid amount for Yale University.
-* Alexa, ask Admission Info what is admission rate for Brown University.
+* Alexa, ask Admission Office what is application fee for Harvard University.
+* Alexa, ask Admission Office Duke University cost.
+* Alexa, ask Admission Office what is financial aid amount for Yale University.
+* Alexa, ask Admission Office what is admission rate for Brown University.
 
 ## Dependencies
 
