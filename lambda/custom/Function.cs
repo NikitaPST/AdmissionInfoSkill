@@ -144,16 +144,20 @@ namespace AdmissionInfoLambda
         /// <param name="message">Speech message.</param>
         /// <param name="shouldEndSession">Terminate session flag.</param>
         /// <param name="type">Response type.</param>
-        private void Speak(string message, bool shouldEndSession = true, ResponseType type = ResponseType.Plain)
+        /// <param name="title">Card caption.</param>
+        /// <param name="text">Card text.</param>
+        private void Speak(string message, bool shouldEndSession = true, ResponseType type = ResponseType.Plain, string title = "", string text = "")
         {
-            //if (title!= string.Empty)
-            //{
-            //    // Create the Simple Card content
-            //    SimpleCard card = new SimpleCard();
-            //    card.Title = title;
-            //    card.Content = message;
-            //    response.Response.Card = card;
-            //}
+            // Card creation
+            if (!string.IsNullOrEmpty(title) && !string.IsNullOrEmpty(text))
+            {
+                SimpleCard card = new SimpleCard()
+                {
+                    Title = title,
+                    Content = text
+                };
+                response.Response.Card = card;
+            }
 
             if (type == ResponseType.SSML)
             {
@@ -288,9 +292,9 @@ namespace AdmissionInfoLambda
                 }
                 else
                 {
-                    string message = string.Format(resource.ApplicationFeeMessage, result.UniversityName, result.Value);
-                    message = MakeSSML(message);
-                    Speak(message, false, ResponseType.SSML);
+                    string text = string.Format(resource.ApplicationFeeMessage, result.UniversityName, result.Value);
+                    string message = MakeSSML(text);
+                    Speak(message, false, ResponseType.SSML, resource.SkillName, text);
                 }
             }
             else
@@ -330,10 +334,10 @@ namespace AdmissionInfoLambda
                 }
                 else
                 {
-                    string message = string.Format(resource.TuitionMessage, result.UniversityName, result.Value);
-                    message = InsertCurrencySymbol(message);
-                    message = MakeSSML(message);
-                    Speak(message, false, ResponseType.SSML);
+                    string text = string.Format(resource.TuitionMessage, result.UniversityName, result.Value);
+                    text = InsertCurrencySymbol(text);
+                    string message = MakeSSML(text);
+                    Speak(message, false, ResponseType.SSML, resource.SkillName, text);
                 }
             }
             else
@@ -373,9 +377,9 @@ namespace AdmissionInfoLambda
                 }
                 else
                 {
-                    string message = string.Format(resource.FinancialAidMessage, result.UniversityName, result.Value);
-                    message = MakeSSML(message);
-                    Speak(message, false, ResponseType.SSML);
+                    string text = string.Format(resource.FinancialAidMessage, result.UniversityName, result.Value);
+                    string message = MakeSSML(text);
+                    Speak(message, false, ResponseType.SSML, resource.SkillName, text);
                 }
             }
             else
@@ -415,9 +419,9 @@ namespace AdmissionInfoLambda
                 }
                 else
                 {
-                    string message = string.Format(resource.AdmissionRateMessage, result.UniversityName, result.Value);
-                    message = MakeSSML(message);
-                    Speak(message, false, ResponseType.SSML);
+                    string text = string.Format(resource.AdmissionRateMessage, result.UniversityName, result.Value);
+                    string message = MakeSSML(text);
+                    Speak(message, false, ResponseType.SSML, resource.SkillName, text);
                 }
             }
             else
