@@ -24,6 +24,14 @@ Try saying following phrases:
 * [AWS Elasticsearch Domain and Index](https://aws.amazon.com/elasticsearch-service/)
 * [aws-signer-v4-dot-net](https://github.com/tsibelman/aws-signer-v4-dot-net)
 
+## Hints
+
+```
+db/Universities.csv
+```
+
+This file contains information about more than 2500 US colleges and universities for the 2018-2019 academic year. Feel free to use it for your own projects.
+
 ## License
 
 Released under the [MIT License](http://www.opensource.org/licenses/mit-license.php).
