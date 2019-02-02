@@ -14,6 +14,7 @@ namespace AdmissionInfoLambda
         public string WelcomeMessage { get; set; }
         public string ShutdownMessage { get; set; }
         public string HelpMessage { get; set; }
+        public string SearchMessage { get; set; }
         public string StartOverMessage { get; set; }
         public string ApplicationFeeMessage { get; set; }
         public string TuitionMessage { get; set; }

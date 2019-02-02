@@ -49,6 +49,7 @@ namespace AdmissionInfoLambda
             resource.TuitionMessage = "Tuition cost for {0} is {1}.";
             resource.FinancialAidMessage = "Average financial aid package in {0} is ${1}.";
             resource.AdmissionRateMessage = "Admission rate in {0} is {1}%.";
+            resource.SearchMessage = "Searching";
 
             resource.NoUniversityFound = "Hmm. I couldn't find data for {0}.";
             resource.NoApplicationFeeFound = "No information available for application fees in {0}.";

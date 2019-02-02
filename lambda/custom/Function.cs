@@ -241,6 +241,7 @@ namespace AdmissionInfoLambda
         {
             if (input.Session.Attributes.ContainsKey(LAST_INTENT_KEY) && input.Session.Attributes.ContainsKey(LAST_SEARCH_KEY))
             {
+                await SendProgressiveResponse(input, resource);
                 string universityName = (string)input.Session.Attributes[LAST_SEARCH_KEY];
                 string intentName = (string)input.Session.Attributes[LAST_INTENT_KEY];
                 switch (intentName)
@@ -268,6 +269,7 @@ namespace AdmissionInfoLambda
         /// <param name="resource">Resource.</param>
         private async Task SearchForApplicationFee(SkillRequest input, SkillResource resource)
         {
+            await SendProgressiveResponse(input, resource);
             string universityName = GetSlot((IntentRequest)input.Request, "universityName");
             await SearchForApplicationFee(universityName, resource);
         }
@@ -310,6 +312,7 @@ namespace AdmissionInfoLambda
         /// <param name="resource">Resource.</param>
         private async Task SearchForTuition(SkillRequest input, SkillResource resource)
         {
+            await SendProgressiveResponse(input, resource);
             string universityName = GetSlot((IntentRequest)input.Request, "universityName");
             await SearchForTuition(universityName, resource);
         }
@@ -353,6 +356,7 @@ namespace AdmissionInfoLambda
         /// <param name="resource">Resource.</param>
         private async Task SearchForFinancialAid(SkillRequest input, SkillResource resource)
         {
+            await SendProgressiveResponse(input, resource);
             string universityName = GetSlot((IntentRequest)input.Request, "universityName");
             await SearchForFinancialAid(universityName, resource);
         }
@@ -395,6 +399,7 @@ namespace AdmissionInfoLambda
         /// <param name="resource">Resource.</param>
         private async Task SearchForAdmissionRate(SkillRequest input, SkillResource resource)
         {
+            await SendProgressiveResponse(input, resource);
             string universityName = GetSlot((IntentRequest)input.Request, "universityName");
             await SearchForAdmissionRate(universityName, resource);
         }
@@ -573,6 +578,21 @@ namespace AdmissionInfoLambda
                 message = message.Replace(match, "$" + match);
             }
             return message;
+        }
+
+        /// <summary>
+        /// Sends response to notify user that Alexa executing search.
+        /// </summary>
+        /// <param name="input">User input.</param>
+        /// <param name="resource">Resource.</param>
+        private async Task SendProgressiveResponse(SkillRequest input, SkillResource resource)
+        {
+            ProgressiveResponse progressiveResponse = new ProgressiveResponse(input);
+            if (progressiveResponse.CanSend())
+            {
+                await progressiveResponse.SendSpeech(resource.SearchMessage);
+                await Task.Delay(TimeSpan.FromSeconds(1.5));
+            }
         }
     }
 }
