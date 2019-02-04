@@ -49,6 +49,7 @@ namespace AdmissionInfoLambda
         private readonly string ESADDRESS = Environment.GetEnvironmentVariable("EsAddress");
         private readonly string ACCESS_KEY = Environment.GetEnvironmentVariable("AccessKey");
         private readonly string SECRET_KEY = Environment.GetEnvironmentVariable("SecretKey");
+        private readonly string IMAGE_FOLDER = Environment.GetEnvironmentVariable("ImageFolder");
 
         // FIELDS
         private ILambdaContext context = null;
@@ -146,17 +147,36 @@ namespace AdmissionInfoLambda
         /// <param name="type">Response type.</param>
         /// <param name="title">Card caption.</param>
         /// <param name="text">Card text.</param>
-        private void Speak(string message, bool shouldEndSession = true, ResponseType type = ResponseType.Plain, string title = "", string text = "")
+        /// <param name="imageLink">Link to card image.</param>
+        private void Speak(string message, bool shouldEndSession = true, ResponseType type = ResponseType.Plain, 
+            string title = "", string text = "", string imageLink = "")
         {
             // Card creation
             if (!string.IsNullOrEmpty(title) && !string.IsNullOrEmpty(text))
             {
-                SimpleCard card = new SimpleCard()
+                if (!string.IsNullOrEmpty(imageLink))
                 {
-                    Title = title,
-                    Content = text
-                };
-                response.Response.Card = card;
+                    StandardCard card = new StandardCard()
+                    {
+                        Title = title,
+                        Content = text,
+                        Image = new CardImage()
+                        {
+                            LargeImageUrl = IMAGE_FOLDER + imageLink,
+                            SmallImageUrl = IMAGE_FOLDER + imageLink
+                        }
+                    };
+                    response.Response.Card = card;
+                }
+                else
+                {
+                    SimpleCard card = new SimpleCard()
+                    {
+                        Title = title,
+                        Content = text
+                    };
+                    response.Response.Card = card;
+                }
             }
 
             if (type == ResponseType.SSML)
@@ -296,7 +316,7 @@ namespace AdmissionInfoLambda
                 {
                     string text = string.Format(resource.ApplicationFeeMessage, result.UniversityName, result.Value);
                     string message = MakeSSML(text);
-                    Speak(message, false, ResponseType.SSML, resource.SkillName, text);
+                    Speak(message, false, ResponseType.SSML, resource.SkillName, text, result.ImageLink);
                 }
             }
             else
@@ -340,7 +360,7 @@ namespace AdmissionInfoLambda
                     string text = string.Format(resource.TuitionMessage, result.UniversityName, result.Value);
                     text = InsertCurrencySymbol(text);
                     string message = MakeSSML(text);
-                    Speak(message, false, ResponseType.SSML, resource.SkillName, text);
+                    Speak(message, false, ResponseType.SSML, resource.SkillName, text, result.ImageLink);
                 }
             }
             else
@@ -383,7 +403,7 @@ namespace AdmissionInfoLambda
                 {
                     string text = string.Format(resource.FinancialAidMessage, result.UniversityName, result.Value);
                     string message = MakeSSML(text);
-                    Speak(message, false, ResponseType.SSML, resource.SkillName, text);
+                    Speak(message, false, ResponseType.SSML, resource.SkillName, text, result.ImageLink);
                 }
             }
             else
@@ -426,7 +446,7 @@ namespace AdmissionInfoLambda
                 {
                     string text = string.Format(resource.AdmissionRateMessage, result.UniversityName, result.Value);
                     string message = MakeSSML(text);
-                    Speak(message, false, ResponseType.SSML, resource.SkillName, text);
+                    Speak(message, false, ResponseType.SSML, resource.SkillName, text, result.ImageLink);
                 }
             }
             else
